@@ -198,7 +198,7 @@ Since a `symbol` is not a constant value the macro can actually extract those pa
 
 The actual `create-fn` implementation might look a bit verbose but it just the minimal amount of steps to create all the actual DOM nodes. I assure you that after `:advanced` optmizations this will match hand-written manual DOM construction code.
 
-```
+```clojure
 (fn [env23497 vals23498]
   (let [el0_div (sf/create-element env23497 :div)
         el1_div (sf/create-element env23497 :div)
@@ -230,7 +230,7 @@ The function will return 2 arrays. One for the actual root nodes that we'll need
 
 The `update-fn` will contain the minimal amount of steps required to get the data into the actual DOM. In this case something like
 
-```
+```clojure
 (fn [env roots nodes oldv newv]
   (sf/update-managed env roots nodes 2 (aget oldv 0) (aget newv 0))
   (sf/update-managed env roots nodes 4 (aget oldv 1) (aget newv 1)))
