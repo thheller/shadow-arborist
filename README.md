@@ -254,6 +254,37 @@ I didn't do any real benchmarks yet but this should outperform `react` by quite 
 
 The macro implementation is really basic and I wrote it in a weekend. We could probably do some very fun and sophisticated stuff there but the basic proof of concept already works quite nicely.
 
+## Dealing with Collections
+
+Often we'll have collections of things that we'll want to display. In `react` there is only-one generic implementation for this is it is handled by having an array of React Element instances where each should have a `.key` property. This key property is used by the implementation to figure out if entries need to be re-ordered. Without a `.key` property the implementation will just render "over" the the elements which may result in many more DOM ops so it can be a lot less efficient than just re-ordering a few nodes.
+
+What always felt odd to me in `react` is that the User is responsible for setting the `.key` property on those React Element which will require iterating the collection which the implementation will then iterate over again.
+
+In `shadow-arborist` the control is flipped and instead the library will handle the `.key` extraction. All we need is the collection, a `key-fn` and a `render-fn` which will be applied to each item.
+
+
+```clojure
+;; simpler interop than update-dom! from above
+(def root (sa/dom-root (js/document.getElementById "app") env))
+
+(defn render [items]
+  (<< [:div "items:" (count items)]
+      [:ul
+       (sa/render-seq items identity
+         (fn [item]
+           (<< [:li "foo" item])))]))
+
+(p/update! root (render [1 2 3 4 5]))
+(p/update! root (render [3 5 1]))
+```
+
+The above example uses `identity` as the `key-fn` since the item is just a simple number and serves find as the key. In actual apps most commonly this would be a keyword and the items would be a sequential collection of maps. (eg. `[{:id 1 :text "foo"} ...]` with `:id` as `key-fn`).
+
+The current implementation is just a function call but that could be enhanced by a macro for some syntax sugar.
+
+The proof of concept implementation is quite simple and works well enough for demo purposes. It could be a bit more efficient and handle perserving active focused elements. Since this is built on the same simple protocols from above we could easily implement other implementations which are optimized for different use-cases. (eg. Drag-n-Drop sorted collections, append-only chat style). The implementations could also easily handle animations for moving items since they are much closer to the DOM and don't have to rebuild everything in the VDOM.
+
+
 ## Unshackled from React
 
 At this point we can do most of the things that `react` (and `react-dom`) actually do for us. The whole React "Fiber" architecture can be replicated using these simple protocols. This is the an area of active exploration and I haven't settled on anything yet. It works and is probably fast enough but I want to explore more.
@@ -269,7 +300,6 @@ The goal of implementing all of this in CLJS is to make choices that make the mo
 There are a lot of other topics I didn't cover yet and will add later. 
 
 - Components
-- Collections (keyed, non-keyed)
 - Server-side Rendering using Clojure
 - `svelte` like transitions and other DOM stuff
 
