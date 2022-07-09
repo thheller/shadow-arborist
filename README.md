@@ -1,3 +1,11 @@
+# REPO OUT OF DATE!
+
+The current code lives in the [shadow-grove](https://github.com/thheller/shadow-grove) repo.
+
+The information below is somewhat outdated but the main concepts remain.
+
+-------------------
+
 # shadow-arborist
 
 > Arborists generally focus on the health and safety of individual ... trees
